@@ -7,7 +7,7 @@
 #
 # Authors:
 #   
-#   <<<YOUR NAME>>>
+#   Natalie Cheng
 #
 #   Starter code: Prof. Joe Hummel
 #   Northwestern University
@@ -325,14 +325,14 @@ def download(baseurl, display=False):
     # deserialize and extract image:
     #
     body = res.json()
+    
+    data = body.get("data",[])
 
-    #
-    # TODO:
-    #
-    userid = "?"
-    assetname = "?"  
-    bucketkey = "?"
-    bytes = "?"
+    # set fields
+    userid = data[0][0]['userid']
+    assetname = data[0][0]['assetname']
+    bucketkey = data[0][0]['bucketkey']
+    image_data_base64 = data[1]
 
     print("userid:", userid)
     print("asset name:", assetname)
@@ -342,18 +342,21 @@ def download(baseurl, display=False):
     # write the binary data to a file (as a
     # binary file, not a text file):
     #
-    # TODO
-    #
+
+    image_data_decoded = base64.b64decode(image_data_base64)
+
+    with open(assetname, "wb") as outfile:
+            outfile.write(image_data_decoded)
 
     print("Downloaded from S3 and saved as '", assetname, "'")
 
     #
-    # uncomment when you have download working:
+    # display if needed
     #
-    #if display:  # display the image?
-    #  image = img.imread(assetname)
-    #  plt.imshow(image)
-    #  plt.show()
+    if display:  # display the image?
+     image = img.imread(assetname)
+     plt.imshow(image)
+     plt.show()
 
   except Exception as e:
     logging.error("download() failed:")
@@ -399,10 +402,25 @@ def bucket_contents(baseurl):
       # any data? if not, break out of loop
       # display data
       #
+
+      # Make a GET request to the /bucket API endpoint
+      res = requests.get(url)
+
+      body = res.json()
+
+      # if it returns 0 assets, break loop
+      if len(body["data"]) == 0:
+        break
+
+      # iterate through the body and print out all the relevant info for each asset
+      for row in body["data"]:
+        print(row["Key"])
+        print(" " + row["LastModified"])
+        print(" " + str(row["Size"]))
       
-      #
-      # TODO
-      #
+      # set the last key equal to the last key of the body
+      lastasset = body["data"][-1]
+      lastkey = lastasset["Key"]
       
       #
       # prompt...
@@ -673,11 +691,14 @@ while cmd != 0:
     users(baseurl)
   elif cmd == 3:
     assets(baseurl)
-  #
-  #
-  # TODO: add calls to command functions for 4 - 7
-  #
-  #
+  elif cmd == 4:
+    download(baseurl, False)
+  elif cmd == 5:
+    download(baseurl, True)
+  elif cmd == 6:
+    bucket_contents(baseurl)
+  elif cmd == 7:
+    add_user(baseurl)
   elif cmd == 8:
     upload(baseurl)
   else:
