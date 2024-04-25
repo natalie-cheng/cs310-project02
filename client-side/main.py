@@ -483,13 +483,11 @@ def add_user(baseurl):
     #
     # build the data packet:
     #
-    # TODO
-    #
     data = {
-      "?": email,
-      "??": last_name,
-      "???": first_name,
-      "???": folder
+      "email": email,
+      "lastname": last_name,
+      "firstname": first_name,
+      "bucketfolder": folder
     }
 
     #
@@ -499,9 +497,9 @@ def add_user(baseurl):
     url = baseurl + api
     
     #
-    # TODO
+    # make the request
     #
-    # res = requests.???(url, json=???)
+    res = requests.put(url, json=data)
     #
 
     #
@@ -522,10 +520,11 @@ def add_user(baseurl):
     #
     body = res.json()
 
-    userid = body["userid"]
-    message = body["message"]
+    # userid = body["userid"]
+    # message = body["message"]
 
-    print("User", userid, "successfully", message)
+    # print("User", userid, "successfully", message)
+    print("done")
 
   except Exception as e:
     logging.error("add_user() failed:")
@@ -582,7 +581,7 @@ def upload(baseurl):
     data = base64.b64encode(bytes)
     datastr = data.decode()
 
-    data = {"assetname": local_filename, "data": datastr}
+    data = {"assetname": local_filename, "data": datastr, "userid": userid}
 
     #
     # call the web service:
@@ -610,9 +609,11 @@ def upload(baseurl):
     #
     body = res.json()
 
-    assetid = body["assetid"]
+    # assetid = body["assetid"]
 
-    print("Image uploaded, asset id =", assetid)
+    # print("Image uploaded, asset id =", assetid)
+
+    print("done")
 
   except Exception as e:
     logging.error("upload() failed:")
