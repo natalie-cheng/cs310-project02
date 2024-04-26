@@ -520,11 +520,10 @@ def add_user(baseurl):
     #
     body = res.json()
 
-    # userid = body["userid"]
-    # message = body["message"]
+    userid = body["userid"]
+    message = body["message"]
 
-    # print("User", userid, "successfully", message)
-    print("done")
+    print("User", userid, "successfully", message)
 
   except Exception as e:
     logging.error("add_user() failed:")
@@ -609,11 +608,9 @@ def upload(baseurl):
     #
     body = res.json()
 
-    # assetid = body["assetid"]
+    assetid = body["assetid"]
 
-    # print("Image uploaded, asset id =", assetid)
-
-    print("done")
+    print("Image uploaded, asset id =", assetid)
 
   except Exception as e:
     logging.error("upload() failed:")
