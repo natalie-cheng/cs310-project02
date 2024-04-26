@@ -3,36 +3,34 @@
 //
 // Return all the users from the database:
 //
-const dbConnection = require('./database.js')
+const dbConnection = require("./database.js");
 
 exports.get_users = async (req, res) => {
-
   console.log("call to get /users...");
 
   try {
+    // sql query
+    let sql = "SELECT * FROM users ORDER BY userid ASC";
+    let params = [];
 
-    
-    throw new Error("TODO: /users");
+    // query the database
+    dbConnection.query(sql, params, (err, rows) => {
+      if (err) {
+        res.status(400).json({ message: err.message, data: [] });
+        return;
+      }
 
-    //
-    // TODO: remember we did an example similar to this in class with
-    // movielens database
-    //
-    // MySQL in JS:
-    //   https://expressjs.com/en/guide/database-integration.html#mysql
-    //   https://github.com/mysqljs/mysql
-    //
-    
-
-  }//try
-  catch (err) {
+      // print results
+      res.status(200).json({ message: "success", data: rows });
+    });
+  } catch (err) {
+    //try
     console.log("**Error in call to get /users");
     console.log(err.message);
-    
-    res.status(400).json({
-      "message": err.message,
-      "data": []
-    });
-  }//catch
 
-}//get
+    res.status(400).json({
+      message: err.message,
+      data: [],
+    });
+  } //catch
+}; //get

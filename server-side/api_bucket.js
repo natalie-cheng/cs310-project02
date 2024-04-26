@@ -15,18 +15,34 @@ exports.get_bucket = async (req, res) => {
 
   try {
 
-    
-    throw new Error("TODO: /bucket/?startafter=bucketkey");
+    // startafter query parameter
+    const startAfter = req.query.startafter;
 
-    //
-    // TODO: remember, 12 at a time...  Do not try to cache them here, instead 
-    // request them 12 at a time from S3
-    //
-    // AWS:
-    //   https://docs.aws.amazon.com/sdk-for-javascript/v3/developer-guide/javascript_s3_code_examples.html
-    //   https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/clients/client-s3/classes/listobjectsv2command.html
-    //   https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/clients/client-s3/
-    //
+    // parameters for ListObjectsV2 command
+    const params = {
+      Bucket: s3_bucket_name,
+      MaxKeys: 12, 
+      StartAfter: startAfter // startafter key
+    };
+
+    // create and execute listobjectsv2command
+    const command = new ListObjectsV2Command(params);
+    const response = await s3.send(command);
+
+    // get contents
+    const assets = response.Contents;
+
+    // get keys from assets
+    const keys = assets.map(asset => ({
+      Key: asset.Key,
+      LastModified: asset.LastModified,
+      ETag: asset.ETag,
+      Size: asset.Size,
+      Storagetype: asset.StorageClass
+    }));
+
+    // print results
+    res.status(200).json({ message: 'success', data: keys });
     
 
   }//try

@@ -326,37 +326,39 @@ def download(baseurl, display=False):
     #
     body = res.json()
     
-    data = body.get("data",[])
+    if body:
+      # print(data[0])
+      # set fields
+      userid = body["user_id"]
+      assetname = body["asset_name"]
+      bucketkey = body["bucket_key"]
+      bytes = body.get("data")
 
-    # set fields
-    userid = data[0][0]['userid']
-    assetname = data[0][0]['assetname']
-    bucketkey = data[0][0]['bucketkey']
-    image_data_base64 = data[1]
+      print("userid:", userid)
+      print("asset name:", assetname)
+      print("bucket key:", bucketkey)
 
-    print("userid:", userid)
-    print("asset name:", assetname)
-    print("bucket key:", bucketkey)
+      #
+      # write the binary data to a file (as a
+      # binary file, not a text file):
+      #
 
-    #
-    # write the binary data to a file (as a
-    # binary file, not a text file):
-    #
+      image_data_decoded = base64.b64decode(bytes)
 
-    image_data_decoded = base64.b64decode(image_data_base64)
+      with open(assetname, "wb") as outfile:
+              outfile.write(image_data_decoded)
 
-    with open(assetname, "wb") as outfile:
-            outfile.write(image_data_decoded)
+      print("Downloaded from S3 and saved as '", assetname, "'")
 
-    print("Downloaded from S3 and saved as '", assetname, "'")
-
-    #
-    # display if needed
-    #
-    if display:  # display the image?
-     image = img.imread(assetname)
-     plt.imshow(image)
-     plt.show()
+      #
+      # display if needed
+      #
+      if display:  # display the image?
+        image = img.imread(assetname)
+        plt.imshow(image)
+        plt.show()
+    else:
+      print("data not valid??")
 
   except Exception as e:
     logging.error("download() failed:")
@@ -580,7 +582,7 @@ def upload(baseurl):
     data = base64.b64encode(bytes)
     datastr = data.decode()
 
-    data = {"assetname": local_filename, "data": datastr, "userid": userid}
+    data = {"assetname": local_filename, "data": datastr}
 
     #
     # call the web service:
